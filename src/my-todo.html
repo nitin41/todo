@@ -1,0 +1,84 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth-script.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-database-script.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-storage-script.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-messaging-script.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-todo">
+  <firebase-app
+    auth-domain="todo-4a3b3.firebaseapp.com"
+    database-url="https://todo-4a3b3.firebaseio.com"
+    api-key="AIzaSyCTIg6IdYMg2wHOIwbh3C3HTUvy7atTW00"
+    storage-bucket="todo-4a3b3.appspot.com"
+    messaging-sender-id="323794424326">
+  </firebase-app>
+
+  <template>
+    <app-localstorage-document id="todo" key="id" data="{{todo}}" storage="window.localStorage"></app-localstorage-document>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <div class="card">
+      <h1>ToDo App</h1>
+      <paper-input id="name" label="name"></paper-input>
+      <paper-fab icon="add" title="add" on-tap="addTodo"></paper-fab>
+      <template is="dom-repeat" items=[[todo]]>
+        <div>
+          <template is="dom-if" if="{{!item.complete}}">
+            <paper-checkbox on-change="checkBoxChange">{{item.name}}</paper-checkbox>
+          </template>
+        </div>  
+      </template>
+      <h3>Completed</h3>
+      <template is="dom-repeat" items=[[todo]]>
+        <div>
+          <template is="dom-if" if="{{item.complete}}">
+            {{item.name}}
+          </template>
+        </div>  
+      </template>
+    </div>
+  </template>
+
+  <script>
+  // element registration
+  
+  Polymer({
+    is: "my-todo",
+    properties: {
+      todo:{
+        type: Array,
+        value: Array,
+      }
+    },
+    addTodo: function(){
+      if(this.$.name.value){
+        var i = this.todo.length+1;
+        this.push('todo',{'id':this.todo.length,"name":this.$.name.value,"complete":false});
+        this.$.name.value = '';
+      }else{
+        alert('Field is empty');
+      }  
+    },
+    checkBoxChange: function(event){
+      var i = event.model.index;
+      var complete = this.todo[i].complete;
+      this.set("todo."+i+".complete",!complete);
+    }
+  });
+</script>
+</dom-module>
